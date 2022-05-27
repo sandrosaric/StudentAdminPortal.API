@@ -36,5 +36,29 @@ namespace StudentAdminPortal.API.Controllers
             }
            
         }
+
+
+        [HttpGet("[controller]/{studentId}")]
+        public async Task<ActionResult<StudentModel>> Get([FromRoute] Guid studentId)
+        {
+            StudentModel result = null;
+
+            try
+            {
+                var student = await _studentRepository.GetStudentByIdAsync(studentId);
+                if(student == null)
+                {
+                    return this.StatusCode(404, "Student not found :(");
+                }
+                result = _mapper.Map<StudentModel>(student);
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return this.StatusCode(500, ex.Message);
+            }
+           
+
+        }
     }
 }
