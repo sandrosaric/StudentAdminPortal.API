@@ -7,14 +7,14 @@ using StudentAdminPortal.API.DomainModels;
 
 namespace StudentAdminPortal.API.Controllers
 {
-  
+
     [ApiController]
     public class StudentsController : ControllerBase
     {
         private readonly IStudentRepository _studentRepository;
         private readonly IMapper _mapper;
 
-        public StudentsController(IStudentRepository studentRepository,IMapper mapper)
+        public StudentsController(IStudentRepository studentRepository, IMapper mapper)
         {
             _studentRepository = studentRepository;
             _mapper = mapper;
@@ -34,7 +34,7 @@ namespace StudentAdminPortal.API.Controllers
             {
                 return this.StatusCode(500, ex.Message);
             }
-           
+
         }
 
 
@@ -46,18 +46,18 @@ namespace StudentAdminPortal.API.Controllers
             try
             {
                 var student = await _studentRepository.GetStudentByIdAsync(studentId);
-                if(student == null)
+                if (student == null)
                 {
                     return this.StatusCode(404, "Student not found :(");
                 }
                 result = _mapper.Map<StudentModel>(student);
                 return Ok(result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return this.StatusCode(500, ex.Message);
             }
-           
+
 
         }
 
@@ -77,8 +77,8 @@ namespace StudentAdminPortal.API.Controllers
                     // Update Details
                     var updatedStudent = await _studentRepository.UpdateStudentAsync(studentId, student);
                     result = _mapper.Map<StudentModel>(updatedStudent);
-                    return Ok(result);   
-                   
+                    return Ok(result);
+
                 }
                 return this.StatusCode(404, "Student not found");
 
@@ -87,8 +87,34 @@ namespace StudentAdminPortal.API.Controllers
             {
                 return this.StatusCode(500, ex.Message);
             }
-            
-           
+
+
+        }
+
+
+
+        [HttpDelete("[controller]/{studentId:guid}")]
+        public async Task<ActionResult<StudentModel>> Delete([FromRoute] Guid studentId)
+        {
+            StudentModel result = null;
+            try
+            {
+                Student deletedStudent =await  _studentRepository.DeleteStudentAsync(studentId);
+                if (deletedStudent == null)
+                {
+                    return this.StatusCode(404, "Student not found.");
+                }
+                    
+                result = _mapper.Map<StudentModel>(deletedStudent);
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return this.StatusCode(500, ex.Message);
+            }
         }
     }
 }
+
+
