@@ -6,5 +6,8 @@ namespace StudentAdminPortal.API.DataModels.Repositories
     {
         Task<List<Student>> GetStudentsAsync();
         Task<Student> GetStudentByIdAsync(Guid studentId);
+
+        Task<bool> ExistsAsync(Guid studentId);
+        Task<Student> UpdateStudentAsync(Guid studentId, Student student);
     }
 }

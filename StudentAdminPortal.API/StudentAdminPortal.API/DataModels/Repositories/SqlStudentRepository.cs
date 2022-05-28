@@ -11,6 +11,7 @@ namespace StudentAdminPortal.API.DataModels.Repositories
             _context = context;
         }
 
+       
         public async Task<Student> GetStudentByIdAsync(Guid studentId)
         {
             return await _context.Students.Include(nameof(Gender)).Include(nameof(Address)).FirstOrDefaultAsync(s => s.Id == studentId);
@@ -21,7 +22,32 @@ namespace StudentAdminPortal.API.DataModels.Repositories
         {
             return await _context.Students.Include(nameof(Gender)).Include(nameof(Address)).ToListAsync();
         }
-       
 
+        public async Task<bool> ExistsAsync(Guid studentId)
+        {
+            return await _context.Students.AnyAsync(x => x.Id == studentId);
+        }
+
+        public async Task<Student> UpdateStudentAsync(Guid studentId, Student student)
+        {
+            var existingStudent = await GetStudentByIdAsync(studentId);
+            if (existingStudent != null)
+            {
+                existingStudent.FirstName = student.FirstName;
+                existingStudent.LastName = student.LastName;
+                existingStudent.DateOfBirth = student.DateOfBirth;
+                existingStudent.Email = student.Email;
+                existingStudent.Mobile = student.Mobile;
+                existingStudent.GenderId = student.GenderId;
+                existingStudent.Address.PhysicalAddress = student.Address.PhysicalAddress;
+                existingStudent.Address.PostalAddress = student.Address.PostalAddress;
+                
+
+                await _context.SaveChangesAsync();
+                return existingStudent;
+            }
+
+            return null;
+        }
     }
 }

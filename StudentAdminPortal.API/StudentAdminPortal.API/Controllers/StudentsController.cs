@@ -38,7 +38,7 @@ namespace StudentAdminPortal.API.Controllers
         }
 
 
-        [HttpGet("[controller]/{studentId}")]
+        [HttpGet("[controller]/{studentId:guid}")]
         public async Task<ActionResult<StudentModel>> Get([FromRoute] Guid studentId)
         {
             StudentModel result = null;
@@ -59,6 +59,36 @@ namespace StudentAdminPortal.API.Controllers
             }
            
 
+        }
+
+
+        [HttpPut]
+        [Route("[controller]/{studentId:guid}")]
+        public async Task<ActionResult<StudentModel>> Update([FromRoute] Guid studentId, [FromBody] StudentFormModel studentFormModel)
+        {
+            StudentModel result = null;
+            try
+            {
+                if (await _studentRepository.ExistsAsync(studentId))
+                {
+
+                    Student student = _mapper.Map<Student>(studentFormModel);
+
+                    // Update Details
+                    var updatedStudent = await _studentRepository.UpdateStudentAsync(studentId, student);
+                    result = _mapper.Map<StudentModel>(updatedStudent);
+                    return Ok(result);   
+                   
+                }
+                return this.StatusCode(404, "Student not found");
+
+            }
+            catch (Exception ex)
+            {
+                return this.StatusCode(500, ex.Message);
+            }
+            
+           
         }
     }
 }
