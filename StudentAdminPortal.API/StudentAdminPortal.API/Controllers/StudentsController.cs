@@ -13,14 +13,16 @@ namespace StudentAdminPortal.API.Controllers
     {
         private readonly IStudentRepository _studentRepository;
         private readonly IMapper _mapper;
+        private readonly LinkGenerator _linkGenerator;
 
-        public StudentsController(IStudentRepository studentRepository, IMapper mapper)
+        public StudentsController(IStudentRepository studentRepository, IMapper mapper,LinkGenerator linkGenerator)
         {
             _studentRepository = studentRepository;
             _mapper = mapper;
+            _linkGenerator = linkGenerator;
         }
 
-        [HttpGet("[controller]")]
+        [HttpGet("[controller]"),ActionName("GetAllStudents")]
         public async Task<ActionResult<List<StudentModel>>> Get()
         {
             List<StudentModel> result = null;
@@ -104,12 +106,35 @@ namespace StudentAdminPortal.API.Controllers
                 {
                     return this.StatusCode(404, "Student not found.");
                 }
-                    
+                   
                 result = _mapper.Map<StudentModel>(deletedStudent);
                 return Ok(result);
 
             }
             catch (Exception ex)
+            {
+                return this.StatusCode(500, ex.Message);
+            }
+        }
+
+
+
+        [HttpPost("[controller]")]
+        public async Task<ActionResult<StudentModel>> Post([FromBody] StudentPostFormModel studentPostFormModel)
+        {
+            StudentModel result = null;
+            try
+            {
+                Student student = _mapper.Map<Student>(studentPostFormModel);
+                Student createdStudent = await _studentRepository.PostStudentAsync(student);
+                if (createdStudent == null)
+                    return this.StatusCode(400, "Bad request");
+                result = _mapper.Map<StudentModel>(createdStudent);
+                
+                return CreatedAtAction("GetAllStudents", new {studentId=result.Id}, createdStudent);
+                
+            }
+            catch(Exception ex)
             {
                 return this.StatusCode(500, ex.Message);
             }

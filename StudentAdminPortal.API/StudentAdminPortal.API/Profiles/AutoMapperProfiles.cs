@@ -19,6 +19,9 @@ namespace StudentAdminPortal.API.Profiles
                 .AfterMap<StudentFormModelAfterMap>();
 
 
+            CreateMap<StudentPostFormModel, Student>().
+                AfterMap<StudentPostFormModelAfterMap>();
+
         }
     }
 }

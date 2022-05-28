@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using StudentAdminPortal.API.DomainModels;
 
 namespace StudentAdminPortal.API.DataModels.Repositories
 {
@@ -60,6 +61,14 @@ namespace StudentAdminPortal.API.DataModels.Repositories
                 return student;
             }
             return null;
+        }
+
+        public async Task<Student> PostStudentAsync(Student student)
+        {
+            var newStudent = await _context.Students.AddAsync(student);
+            await _context.SaveChangesAsync();
+            return newStudent.Entity;
+            
         }
     }
 }

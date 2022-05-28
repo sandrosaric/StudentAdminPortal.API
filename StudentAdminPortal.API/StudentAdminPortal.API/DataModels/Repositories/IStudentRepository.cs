@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using StudentAdminPortal.API.DomainModels;
+using System.Collections.Generic;
 
 namespace StudentAdminPortal.API.DataModels.Repositories
 {
@@ -10,5 +11,6 @@ namespace StudentAdminPortal.API.DataModels.Repositories
         Task<bool> ExistsAsync(Guid studentId);
         Task<Student> UpdateStudentAsync(Guid studentId, Student student);
         Task<Student> DeleteStudentAsync(Guid studentId);
+        Task<Student> PostStudentAsync(Student student);
     }
 }
