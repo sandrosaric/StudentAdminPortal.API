@@ -145,21 +145,37 @@ namespace StudentAdminPortal.API.Controllers
         [HttpPost("[controller]/{studentId:guid}/upload-image")]
         public async Task<ActionResult> UploadImage([FromRoute] Guid studentId,IFormFile profileImage)
         {
-            if (await _studentRepository.ExistsAsync(studentId))
+            var supportedExtensions = new List<string>()
             {
-                var fileName = Guid.NewGuid() + Path.GetExtension(profileImage.FileName);
-                var fileImagePath = await _imageRepository.Upload(profileImage,fileName);
-                bool success = await  _studentRepository.UpdateProfileImage(studentId,fileImagePath);
-                if (success)
+                "jpg",
+                "jpeg",
+                "png",
+                "gif"
+            };
+            if(profileImage != null && profileImage.Length > 0)
+            {
+                var extension = Path.GetExtension(profileImage.FileName);
+                if (supportedExtensions.Contains(extension))
                 {
-                    return Ok(fileImagePath);
-                }
-                else
-                {
-                    return this.StatusCode(StatusCodes.Status500InternalServerError,"Error uploading image :(");
+                    if (await _studentRepository.ExistsAsync(studentId))
+                    {
+                        var fileName = Guid.NewGuid() + Path.GetExtension(profileImage.FileName);
+                        var fileImagePath = await _imageRepository.Upload(profileImage, fileName);
+                        bool success = await _studentRepository.UpdateProfileImage(studentId, fileImagePath);
+                        if (success)
+                        {
+                            return Ok(fileImagePath);
+                        }
+                        else
+                        {
+                            return this.StatusCode(StatusCodes.Status500InternalServerError, "Error uploading image :(");
+                        }
+                    }
                 }
             }
-            return this.StatusCode(404, "Not Found");
+           
+            
+            return this.StatusCode(400, "This is not a valid image format.");
         }
     }
 }
